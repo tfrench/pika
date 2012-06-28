@@ -325,7 +325,7 @@ class Connection(object):
         self.connection_state = CONNECTION_PROTOCOL
 
         # Start the communication with the RabbitMQ Broker
-        self._send_frame(pika.frame.ProtocolHeader())
+        self.send_frame(pika.frame.ProtocolHeader())
 
         # Let our reconnection_strategy know we're connected
         self.reconnection.on_transport_connected(self)
@@ -755,7 +755,7 @@ class Connection(object):
         # Send the rpc call to RabbitMQ
         self._send_method(channel_number, method)
 
-    def _send_frame(self, frame):
+    def send_frame(self, frame):
         """
         This appends the fully generated frame to send to the broker to the
         output buffer which will be then sent via the connection adapter.
@@ -795,7 +795,7 @@ class Connection(object):
         """
         Constructs a RPC method frame and then sends it to the broker.
         """
-        self._send_frame(pika.frame.Method(channel_number, method))
+        self.send_frame(pika.frame.Method(channel_number, method))
 
         if isinstance(content, tuple):
             props = content[0]
@@ -808,7 +808,7 @@ class Connection(object):
             length = 0
             if body:
                 length = len(body)
-            self._send_frame(pika.frame.Header(channel_number, length, props))
+            self.send_frame(pika.frame.Header(channel_number, length, props))
 
         if body:
             max_piece = (self.parameters.frame_max - \
@@ -820,7 +820,7 @@ class Connection(object):
             while body_buf:
                 piece_len = min(len(body_buf), max_piece)
                 piece = body_buf.read_and_consume(piece_len)
-                self._send_frame(pika.frame.Body(channel_number, piece))
+                self.send_frame(pika.frame.Body(channel_number, piece))
                 frames_sent += 1
 
     @property
