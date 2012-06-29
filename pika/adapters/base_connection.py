@@ -92,12 +92,6 @@ class BaseConnection(Connection):
         if params.tcp_keepalive:
             self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
 
-            for opt, var in ((socket.TCP_KEEPIDLE,  params.tcp_keepidle),
-                             (socket.TCP_KEEPINTVL, params.tcp_keepintvl),
-                             (socket.TCP_KEEPCNT,   params.tcp_keepcnt)):
-                if var is not None:
-                    self.socket.setsockopt(socket.SOL_TCP, opt, var)
-
         # Wrap the SSL socket if we SSL turned on
         ssl_text = ""
         if self.parameters.ssl:
