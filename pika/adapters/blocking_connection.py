@@ -8,6 +8,8 @@ import socket
 import time
 import types
 
+import datetime
+
 import pika.log as log
 import pika.spec as spec
 
@@ -141,10 +143,10 @@ class BlockingConnection(BaseConnection):
 
     def add_timeout(self, deadline, callback):
         """
-        Add a timeout to the stack by deadline.
+        Add a timeout to the stack by deadline as offset.
         """
         timeout_id = '%.8f' % time.time()
-        self._timeouts[timeout_id] = {'deadline': deadline,
+        self._timeouts[timeout_id] = {'deadline': time.time() + deadline,
                                       'handler': callback}
         return timeout_id
 
@@ -246,7 +248,7 @@ class BlockingChannelTransport(ChannelTransport):
         """
         Shortcut wrapper to send a method through our connection, passing in
         our channel number.
-        """
+        """    
         self.wait = wait
         self._received_response = False
         self.connection._send_method(self.channel_number, method, content)

@@ -103,8 +103,7 @@ class HeartbeatChecker(object):
         every interval seconds.
 
         """
-        deadline = time.time() + self._interval
-        self._connection.add_timeout(deadline, self.send_and_check)
+        self._connection.add_timeout(self._interval, self.send_and_check)
 
     def _should_send_heartbeat_frame(self):
         """Returns True if the amount of bytes recorded the last time the
@@ -147,7 +146,7 @@ class HeartbeatChecker(object):
         if we've missed any heartbeats and disconnect our connection if it's
         been idle too long.
 
-        """   
+        """
         # If too many heartbeats have been missed, close & reset the connection
         if self._too_many_missed_heartbeats():
             self._close_connection()
