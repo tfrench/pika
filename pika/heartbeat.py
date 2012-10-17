@@ -159,6 +159,8 @@ class HeartbeatChecker(object):
         if self._should_send_heartbeat_frame():
             log.debug('send heartbeat frame')
             self._send_heartbeat_frame()
+        else:
+            log.debug('no heartbeat to send')
 
         # Update the byte counts for the next check
         self._update_byte_counts()
