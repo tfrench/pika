@@ -149,6 +149,7 @@ class HeartbeatChecker(object):
                   % (self._sent, self.received))
         # If too many heartbeats have been missed, close & reset the connection
         if self._too_many_missed_heartbeats():
+            log.debug('missed too many heartbeats; close connection')
             self._close_connection()
             return
 
@@ -159,6 +160,9 @@ class HeartbeatChecker(object):
 
         # Update the byte counts for the next check
         self._update_byte_counts()
+        
+        log.debug('updated byte counts: sent: %s; received: %s' 
+                  % (self._sent, self._received))
 
         # Update the timer to fire again
         self._start_timer()
