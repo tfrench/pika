@@ -18,7 +18,7 @@ from pika.channel import Channel, ChannelTransport
 from pika.exceptions import AMQPConnectionError, AMQPChannelError
 from pika.callback import _name_or_value
 
-SOCKET_TIMEOUT = 0.25
+SOCKET_TIMEOUT = 1
 SOCKET_TIMEOUT_THRESHOLD = 100
 SOCKET_TIMEOUT_MESSAGE = "BlockingConnection: Timeout exceeded, disconnected"
 
@@ -84,6 +84,8 @@ class BlockingConnection(BaseConnection):
             self._socket_timeouts = 0
         except socket.timeout:
             self._socket_timeouts += 1
+            log.debug('_flush_outbound: write socket.timeout number: %s' % self._socket_timeouts)
+            
             if self._socket_timeouts > SOCKET_TIMEOUT_THRESHOLD:
                 log.error(SOCKET_TIMEOUT_MESSAGE)
                 self._handle_disconnect()
@@ -108,6 +110,7 @@ class BlockingConnection(BaseConnection):
             self._socket_timeouts = 0
         except socket.timeout:
             self._socket_timeouts += 1
+            log.debug('process_data_events: read socket.timeout number: %s' % self._socket_timeouts)
             if self._socket_timeouts > SOCKET_TIMEOUT_THRESHOLD:
                 log.error(SOCKET_TIMEOUT_MESSAGE)
                 self._handle_disconnect()
