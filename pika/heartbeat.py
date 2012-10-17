@@ -44,13 +44,10 @@ class HeartbeatChecker(object):
     def _close_connection(self):
         """Close the connection with the AMQP Connection-Forced value."""
         duration = self._missed * self._interval
+        log.debug('close connection; missed %s' % duration)
         self._connection.close(HeartbeatChecker._CONNECTION_FORCED,
                                HeartbeatChecker._STALE_CONNECTION % duration)
-
-    def _reset_connection(self):
-        """Tell the connection to re-connect"""
-        self._connection.force_reconnect()
-
+        
     def _connection_bytes_received(self):
         """Return the number of bytes received by the connection bytes object.
 
@@ -153,7 +150,6 @@ class HeartbeatChecker(object):
         # If too many heartbeats have been missed, close & reset the connection
         if self._too_many_missed_heartbeats():
             self._close_connection()
-            self._reset_connection()
             return
 
         # If there have been no bytes received since the last check
