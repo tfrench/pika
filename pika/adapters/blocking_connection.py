@@ -168,9 +168,6 @@ class BlockingConnection(BaseConnection):
         for timeout_id in keys:
             if timeout_id in self._timeouts and \
                 self._timeouts[timeout_id]['deadline'] <= start_time:
-                log.debug('%s: Timeout calling %s',
-                          self.__class__.__name__,
-                          self._timeouts[timeout_id]['handler'])
                 self._timeouts.pop(timeout_id)['handler']()
 
 
