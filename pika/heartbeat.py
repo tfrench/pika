@@ -10,7 +10,7 @@ Class that handles heartbeat communication
 import time
 
 from pika import frame
-
+import pika.log as log
 
 class HeartbeatChecker(object):
     """Checks to make sure that our heartbeat is received at the expected
@@ -103,6 +103,7 @@ class HeartbeatChecker(object):
         every interval seconds.
 
         """
+        log.debug('add heartbeat timeout')
         self._connection.add_timeout(self._interval, self.send_and_check)
 
     def _should_send_heartbeat_frame(self):
@@ -147,6 +148,8 @@ class HeartbeatChecker(object):
         been idle too long.
 
         """
+        log.debug('send_and_check: current bytes sent: %s and received: %s' \
+                  % (self._sent, self.received))
         # If too many heartbeats have been missed, close & reset the connection
         if self._too_many_missed_heartbeats():
             self._close_connection()
@@ -155,6 +158,7 @@ class HeartbeatChecker(object):
 
         # If there have been no bytes received since the last check
         if self._should_send_heartbeat_frame():
+            log.debug('send heartbeat frame')
             self._send_heartbeat_frame()
 
         # Update the byte counts for the next check
