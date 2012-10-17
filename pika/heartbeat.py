@@ -81,6 +81,8 @@ class HeartbeatChecker(object):
         a heartbeat sent since the last check.
 
         """  
+        log.debug('check missed heartbeat: old received: %s, received: %s'
+                  % (self._received, self._connection_bytes_received()))
         if self._received == self._connection_bytes_received():
             self._missed += 1
         else:
@@ -147,7 +149,7 @@ class HeartbeatChecker(object):
         been idle too long.
 
         """
-        log.debug('send_and_check: current bytes sent: %s and received: %s' \
+        log.debug('send_and_check: old bytes sent: %s and received: %s' \
                   % (self._sent, self._received))
         # If too many heartbeats have been missed, close & reset the connection
         if self._too_many_missed_heartbeats():
