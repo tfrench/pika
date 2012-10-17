@@ -38,6 +38,8 @@ class HeartbeatChecker(object):
         self._received = 0
         self._sent = 0
 
+        log.debug('heartbeat with interval: %s' % self._interval)
+
         # Setup the timer to fire in _interval seconds
         self._setup_timer()
 
