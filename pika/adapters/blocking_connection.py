@@ -34,6 +34,9 @@ class BlockingConnection(BaseConnection):
 
     def __init__(self, parameters=None, reconnection_strategy=None):
         BaseConnection.__init__(self, parameters, None, reconnection_strategy)
+        
+        for h in log.logger.handlers:
+            log.debug('pika handlers: %s' % h)
 
     def _adapter_connect(self):
         BaseConnection._adapter_connect(self)
@@ -172,9 +175,6 @@ class BlockingConnection(BaseConnection):
         for timeout_id in self._timeouts.keys():
             if timeout_id in self._timeouts and \
                 self._timeouts[timeout_id]['deadline'] <= time.time():
-                log.debug('call scheduled timeout: %s; deadline: %s' 
-                          % (self._timeouts.get(timeout_id)['handler'],
-                             self._timeouts[timeout_id]['deadline']))
                 self._timeouts.pop(timeout_id)['handler']()
 
 
