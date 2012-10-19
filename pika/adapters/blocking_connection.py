@@ -148,8 +148,12 @@ class BlockingConnection(BaseConnection):
         """
         Add a timeout to the stack by deadline as offset.
         """
-        timeout_id = '%.8f' % time.time()
-        self._timeouts[timeout_id] = {'deadline': time.time() + deadline,
+        t = time.time()
+        timeout_id = '%.8f' % t
+        dl = t + deadline
+        log.debug('add timeout: time: %s; deadline: %s; and callback: %s' 
+                  % (t, deadline, callback))
+        self._timeouts[timeout_id] = {'deadline': dl,
                                       'handler': callback}
         return timeout_id
 
@@ -165,12 +169,14 @@ class BlockingConnection(BaseConnection):
         Process our self._timeouts event stack.
         """
         # Process our timeout events
-        keys = self._timeouts.keys()
-
-        start_time = time.time()
-        for timeout_id in keys:
+        log.debug('process_timeouts: num of timeouts: %s' 
+                  % len(self._timeouts))
+        for timeout_id in self._timeouts.keys():
             if timeout_id in self._timeouts and \
-                self._timeouts[timeout_id]['deadline'] <= start_time:
+                self._timeouts[timeout_id]['deadline'] <= time.time():
+                log.debug('call scheduled timeout: %s; deadline: %s' 
+                          % (self._timeouts.pop(timeout_id)['handler'], 
+                             self._timeouts[timeout_id]['deadline']))
                 self._timeouts.pop(timeout_id)['handler']()
 
 
