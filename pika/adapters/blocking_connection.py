@@ -169,8 +169,6 @@ class BlockingConnection(BaseConnection):
         Process our self._timeouts event stack.
         """
         # Process our timeout events
-        log.debug('process_timeouts: num of timeouts: %s' 
-                  % len(self._timeouts))
         for timeout_id in self._timeouts.keys():
             if timeout_id in self._timeouts and \
                 self._timeouts[timeout_id]['deadline'] <= time.time():
