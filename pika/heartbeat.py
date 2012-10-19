@@ -38,7 +38,7 @@ class HeartbeatChecker(object):
         self._received = 0
         self._sent = 0
 
-        log.debug('heartbeat with interval: %s' % self._interval)
+        log.debug('heartbeat: %s - with interval: %s' % (self, self._interval))
 
         # Setup the timer to fire in _interval seconds
         self._setup_timer()
@@ -46,7 +46,8 @@ class HeartbeatChecker(object):
     def _close_connection(self):
         """Close the connection with the AMQP Connection-Forced value."""
         duration = self._missed * self._interval
-        log.debug('close connection; missed %s' % duration)
+        log.debug('heartbeat: %s - close connection; missed %s' 
+                  % (self, duration))
         self._connection.close(HeartbeatChecker._CONNECTION_FORCED,
                                HeartbeatChecker._STALE_CONNECTION % duration)
         
@@ -81,8 +82,8 @@ class HeartbeatChecker(object):
         a heartbeat sent since the last check.
 
         """  
-        log.debug('check missed heartbeat: old received: %s, received: %s'
-                  % (self._received, self._connection_bytes_received()))
+        log.debug('heartbeat: %s - check missed heartbeat: old received: %s, received: %s'
+                  % (self, self._received, self._connection_bytes_received()))
         if self._received == self._connection_bytes_received():
             self._missed += 1
         else:
@@ -104,7 +105,7 @@ class HeartbeatChecker(object):
         every interval seconds.
 
         """
-        log.debug('add heartbeat timeout')
+        log.debug('heartbeat: %s - add heartbeat timeout' % self)
         self._connection.add_timeout(self._interval, self.send_and_check)
 
     def _should_send_heartbeat_frame(self):
@@ -149,26 +150,27 @@ class HeartbeatChecker(object):
         been idle too long.
 
         """
-        log.debug('send_and_check: old bytes sent: %s and received: %s' \
-                  % (self._sent, self._received))
+        log.debug('send_and_check: heartbeat: %s -s old bytes sent: %s and received: %s'
+                  % (self, self._sent, self._received))
         # If too many heartbeats have been missed, close & reset the connection
         if self._too_many_missed_heartbeats():
-            log.debug('missed too many heartbeats; close connection')
+            log.debug('heartbeat: %s - missed too many heartbeats; close connection' 
+                      % self)
             self._close_connection()
             return
 
         # If there have been no bytes received since the last check
         if self._should_send_heartbeat_frame():
-            log.debug('send heartbeat frame')
+            log.debug('heartbeat: %s - send heartbeat frame' % self)
             self._send_heartbeat_frame()
         else:
-            log.debug('no heartbeat to send')
+            log.debug('heartbeat: %s - no heartbeat to send' % self)
 
         # Update the byte counts for the next check
         self._update_byte_counts()
         
-        log.debug('updated byte counts: sent: %s; received: %s' 
-                  % (self._sent, self._received))
+        log.debug('heartbeat: %s - updated byte counts: sent: %s; received: %s' 
+                  % (self, self._sent, self._received))
 
         # Update the timer to fire again
         self._start_timer()
