@@ -152,7 +152,7 @@ class BlockingConnection(BaseConnection):
         timeout_id = '%.8f' % t
         dl = t + deadline
         log.debug('add timeout: time: %s; deadline: %s; and callback: %s' 
-                  % (t, deadline, callback))
+                  % (t, dl, callback))
         self._timeouts[timeout_id] = {'deadline': dl,
                                       'handler': callback}
         return timeout_id
