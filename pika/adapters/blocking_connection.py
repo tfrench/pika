@@ -175,7 +175,7 @@ class BlockingConnection(BaseConnection):
             if timeout_id in self._timeouts and \
                 self._timeouts[timeout_id]['deadline'] <= time.time():
                 log.debug('call scheduled timeout: %s; deadline: %s' 
-                          % (self._timeouts.pop(timeout_id)['handler'], 
+                          % (self._timeouts.get(timeout_id)['handler'],
                              self._timeouts[timeout_id]['deadline']))
                 self._timeouts.pop(timeout_id)['handler']()
 
